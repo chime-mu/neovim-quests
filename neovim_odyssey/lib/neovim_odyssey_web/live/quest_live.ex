@@ -97,6 +97,16 @@ defmodule NeovimOdysseyWeb.QuestLive do
           </div>
         </div>
 
+        <%!-- NPC Greeting --%>
+        <%= if @quest.npc_greeting do %>
+          <div class="border-l-2 border-amber-500/30 bg-amber-500/5 rounded-r-lg pl-4 pr-4 py-3 mb-6">
+            <%= if @zone && @zone.npc do %>
+              <p class="text-xs font-bold text-amber-400/70 mb-1">{@zone.npc}</p>
+            <% end %>
+            <p class="text-sm text-slate-300 italic">"{@quest.npc_greeting}"</p>
+          </div>
+        <% end %>
+
         <%!-- Description --%>
         <p class="text-slate-300 mb-6">{@quest.description}</p>
 
@@ -117,7 +127,7 @@ defmodule NeovimOdysseyWeb.QuestLive do
           </ul>
         </div>
 
-        <%!-- Turn-in criteria --%>
+        <%!-- Turn-in / NPC Confirmation --%>
         <div class={[
           "rounded-lg p-4 mb-6",
           if(@completed,
@@ -125,10 +135,18 @@ defmodule NeovimOdysseyWeb.QuestLive do
             else: "bg-slate-700/50 border border-slate-600/50"
           )
         ]}>
-          <h3 class="text-xs font-bold text-slate-400 tracking-wider uppercase mb-1">Turn-in</h3>
-          <p class={["text-sm", if(@completed, do: "text-emerald-300", else: "text-slate-300")]}>
-            {@quest.turn_in}
-          </p>
+          <%= if @completed && @quest.npc_confirmation do %>
+            <%!-- Show NPC confirmation when complete --%>
+            <%= if @zone && @zone.npc do %>
+              <p class="text-xs font-bold text-emerald-400/70 mb-1">{@zone.npc}</p>
+            <% end %>
+            <p class="text-sm text-emerald-300 italic">"{@quest.npc_confirmation}"</p>
+          <% else %>
+            <h3 class="text-xs font-bold text-slate-400 tracking-wider uppercase mb-1">Turn-in</h3>
+            <p class={["text-sm", if(@completed, do: "text-emerald-300", else: "text-slate-300")]}>
+              {@quest.turn_in}
+            </p>
+          <% end %>
         </div>
 
         <%!-- Complete button --%>

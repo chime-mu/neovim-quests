@@ -10,7 +10,9 @@ defmodule NeovimOdyssey.Quests.Quest do
     :description,
     :objectives,
     :turn_in,
-    :type
+    :type,
+    :npc_greeting,
+    :npc_confirmation
   ]
 
   @type quest_type :: :chain | :side | :boss | :daily
@@ -24,6 +26,8 @@ defmodule NeovimOdyssey.Quests.Quest do
           description: String.t(),
           objectives: [String.t()],
           turn_in: String.t(),
-          type: quest_type()
+          type: quest_type(),
+          npc_greeting: String.t() | nil,
+          npc_confirmation: String.t() | nil
         }
 end

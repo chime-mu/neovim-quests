@@ -71,8 +71,19 @@ defmodule NeovimOdysseyWeb.ZoneLive do
             <h1 class="text-2xl font-black text-slate-100">{@zone.name}</h1>
           </div>
         </div>
-        <p class="text-slate-400 italic mb-3">"{@zone.tagline}"</p>
-        <p class="text-sm text-slate-500">{@zone.theme}</p>
+
+        <%!-- Zone intro (environmental description) --%>
+        <%= if @zone.zone_intro do %>
+          <p class="text-sm text-slate-400 italic leading-relaxed mb-4">{@zone.zone_intro}</p>
+        <% end %>
+
+        <%!-- NPC intro --%>
+        <%= if @zone.npc do %>
+          <div class="border-l-2 border-amber-500/40 pl-4 mb-4">
+            <p class="text-xs font-bold text-amber-400/80 mb-1">{@zone.npc}, {@zone.npc_title}</p>
+            <p class="text-sm text-slate-300 italic">"{@zone.tagline}"</p>
+          </div>
+        <% end %>
 
         <%!-- Zone progress bar --%>
         <div class="mt-4">
