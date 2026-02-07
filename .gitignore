@@ -1,0 +1,24 @@
+# Elixir/Phoenix (neovim_odyssey/)
+neovim_odyssey/_build/
+neovim_odyssey/cover/
+neovim_odyssey/deps/
+neovim_odyssey/doc/
+neovim_odyssey/.fetch
+neovim_odyssey/tmp/
+neovim_odyssey/priv/static/assets/
+neovim_odyssey/priv/static/cache_manifest.json
+neovim_odyssey/assets/node_modules/
+neovim_odyssey/neovim_odyssey-*.tar
+erl_crash.dump
+*.ez
+npm-debug.log
+
+# Database files
+*.db
+*.db-*
+
+# Claude Code
+.claude/
+
+# Misc
+/test
