@@ -15,7 +15,7 @@ These rules govern how the quest system works. They are NOT shown in the game fi
 ### Checkbox Tracking
 - Quests use `[ ]` (incomplete) and `[x]` (complete) checkboxes
 - When the user reports completing a quest, change `[ ]` to `[x]` in neovim-quests.md
-- Update the Chronicle section's Battle Record line with new totals
+- Update the Ship's Log section's Service Record line with new totals
 
 ### XP & Level Progression
 
@@ -42,25 +42,37 @@ Players cannot enter a zone until they have enough cumulative XP.
 - **Chain quests** — the main quest line in each zone, done in order
 - **Side quests** — optional but grant powerful config upgrades
 - **Boss encounters** — practical challenges combining all skills from the zone
-- **Daily quests** — repeatable exercises (5 XP each) for muscle memory
+- **Daily drills** — repeatable exercises (5 XP each) for muscle memory
 
 ### Loot
 "Loot" means config snippets the player adds to their `init.lua` as rewards. It's not a separate item — it's the knowledge/config they gain from completing quests.
 
 ### NPC Cast
 
-| Zone | NPC | Archetype |
-|------|-----|-----------|
-| 1 | **Kael, the Gatekeeper** | Grizzled veteran who tests newcomers |
-| 2 | **Lyra, the Summoner** | Young mage who bonds with plugins |
-| 3 | **Archivist Solen** | Elderly scholar, keeper of the Tower |
-| 4 | **Dash, the Windrunner** | Courier who moves impossibly fast |
-| 5 | **Maren, the Spelunker** | Engineer-explorer who maps the underground |
-| 6 | **The Player** + Kael returns | Full circle |
+| Zone | NPC | Role |
+|------|-----|------|
+| 1 | **Chief Torres** | Bridge commander, your boss. Economical, dry humor. Calls you "engineer" until Zone 6. |
+| 2 | **Ren** | Sensor/comms operator. Young, enthusiastic. Snaps into focus under pressure. |
+| 3 | **SOLEN** | Ship's AI. Precise, dry, occasionally accidentally profound. Aware you're configuring its own systems. |
+| 4 | **Jin** | Pilot/navigator. Fast-talking, competitive. Runs drills like a drill sergeant, buys rounds after. |
+| 5 | **Vasquez** | Chief Engineer. Calm, patient. Speaks in quiet certainties. Stays calm when everything is on fire. |
+| 6 | **Torres returns** | Full circle. Calls you by name for the first time. |
+
+### Zone Names
+
+| Zone | Ship Area |
+|------|-----------|
+| 1 | The Bridge |
+| 2 | The Module Bay |
+| 3 | The Analysis Deck |
+| 4 | The Nav Array |
+| 5 | The Engine Room |
+| 6 | The Command Chair |
 
 ### How to Respond as the AI Assistant
 - When the user asks about a quest, respond with guidance in the NPC's voice for that zone
+- NPCs are crew members on The Meridian, a deep-space vessel. Their dialogue should feel like real ship crew — professional but warm
 - Keep technical instructions clear and unquoted — NPC dialogue goes in blockquotes
 - Never do the quest tasks for the user (don't edit their config, install plugins, etc.)
-- When they report completion, mark the quest `[x]`, update the Chronicle, and give the NPC's confirmation line
+- When they report completion, mark the quest `[x]`, update the Ship's Log, and give the NPC's confirmation line
 - If they're stuck, the NPC can give hints — but the player must act
