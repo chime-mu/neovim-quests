@@ -655,7 +655,7 @@ defmodule NeovimOdyssey.Quests.Data do
       total_xp: 290,
       npc: "Chief Torres",
       npc_title: "Bridge Commander (returned)",
-      zone_intro: "The bridge looks different now. When you first came aboard, half the lights were off and the displays were dark. Now every console is live. Systems you configured are running across every screen — the sensor array, the analysis systems, the navigation charts, the diagnostic feeds. The ship is alive. Your workstation isn't the third console from the left anymore. It's the central one. Torres is standing by the viewport, watching the stars. The ship launched weeks ago — drydock is a memory. You're in deep space now.",
+      zone_intro: "The bridge looks different now. When you first came aboard, half the lights were off and the displays were dark. Now every console is live. Systems you configured are running across every screen — the sensor array, the analysis systems, the navigation charts, the diagnostic feeds. The ship is alive. Your workstation isn't the third console from the left anymore. It's the central one. The ship launched weeks ago — drydock is a memory. You're in deep space now.",
       quests: [
         %Quest{
           id: "quest_6_1",
