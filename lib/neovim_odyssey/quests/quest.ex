@@ -12,7 +12,10 @@ defmodule NeovimOdyssey.Quests.Quest do
     :turn_in,
     :type,
     :npc_greeting,
-    :npc_confirmation
+    :npc_confirmation,
+    :verification_type,
+    :verification_checks,
+    :loot
   ]
 
   @type quest_type :: :chain | :side | :boss | :daily
@@ -28,6 +31,9 @@ defmodule NeovimOdyssey.Quests.Quest do
           turn_in: String.t(),
           type: quest_type(),
           npc_greeting: String.t() | nil,
-          npc_confirmation: String.t() | nil
+          npc_confirmation: String.t() | nil,
+          verification_type: :auto | :self_attest | :hybrid | nil,
+          verification_checks: [term()] | nil,
+          loot: map() | nil
         }
 end

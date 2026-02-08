@@ -3,7 +3,7 @@ defmodule NeovimOdyssey.Progress do
 
   import Ecto.Query
   alias NeovimOdyssey.Repo
-  alias NeovimOdyssey.Progress.{CompletedQuest, DailyQuestLog}
+  alias NeovimOdyssey.Progress.{CompletedQuest, DailyQuestLog, PlayerStats}
   alias NeovimOdyssey.Quests
 
   @level_thresholds [{1, 0}, {5, 200}, {10, 500}, {15, 900}, {20, 1400}, {25, 2000}]
@@ -275,5 +275,82 @@ defmodule NeovimOdyssey.Progress do
       nil -> true
       zone_id -> zone_unlocked?(zone_id)
     end
+  end
+
+  # --- HP System ---
+
+  @hp_regen_per_hour 5
+  @hp_daily_restore 10
+  @boss_hp_cost 25
+
+  def get_stats do
+    stats = Repo.one(from(s in PlayerStats, limit: 1)) || create_initial_stats()
+    apply_natural_regen(stats)
+  end
+
+  def get_hp, do: get_stats().hp
+
+  defp create_initial_stats do
+    %PlayerStats{}
+    |> PlayerStats.changeset(%{hp: 100, max_hp: 100, last_hp_regen_at: DateTime.utc_now()})
+    |> Repo.insert!()
+  end
+
+  defp apply_natural_regen(%PlayerStats{hp: hp, max_hp: max_hp} = stats) when hp >= max_hp do
+    stats
+  end
+
+  defp apply_natural_regen(%PlayerStats{last_hp_regen_at: nil} = stats) do
+    stats
+    |> PlayerStats.changeset(%{last_hp_regen_at: DateTime.utc_now()})
+    |> Repo.update!()
+  end
+
+  defp apply_natural_regen(%PlayerStats{hp: hp, max_hp: max_hp, last_hp_regen_at: last_regen} = stats) do
+    now = DateTime.utc_now()
+    hours_elapsed = DateTime.diff(now, last_regen, :second) / 3600.0
+    regen_amount = trunc(hours_elapsed * @hp_regen_per_hour)
+
+    if regen_amount > 0 do
+      new_hp = min(hp + regen_amount, max_hp)
+
+      stats
+      |> PlayerStats.changeset(%{hp: new_hp, last_hp_regen_at: now})
+      |> Repo.update!()
+    else
+      stats
+    end
+  end
+
+  def lose_hp(amount \\ @boss_hp_cost) do
+    stats = get_stats()
+    new_hp = max(stats.hp - amount, 0)
+
+    stats
+    |> PlayerStats.changeset(%{hp: new_hp, last_hp_regen_at: DateTime.utc_now()})
+    |> Repo.update!()
+  end
+
+  def restore_hp(amount \\ @hp_daily_restore) do
+    stats = get_stats()
+    new_hp = min(stats.hp + amount, stats.max_hp)
+
+    stats
+    |> PlayerStats.changeset(%{hp: new_hp})
+    |> Repo.update!()
+  end
+
+  def can_attempt_boss?, do: get_stats().hp > 0
+
+  def record_boss_attempt(_quest_id, passed?) do
+    stats = get_stats()
+    new_attempts = stats.boss_attempts + 1
+
+    attrs = %{boss_attempts: new_attempts}
+    attrs = if not passed?, do: Map.put(attrs, :hp, max(stats.hp - @boss_hp_cost, 0)), else: attrs
+
+    stats
+    |> PlayerStats.changeset(attrs)
+    |> Repo.update!()
   end
 end

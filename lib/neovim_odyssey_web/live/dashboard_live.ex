@@ -25,6 +25,9 @@ defmodule NeovimOdysseyWeb.DashboardLive do
     completed_count = length(Progress.completed_quest_ids())
     bosses_cleared = Progress.completed_quest_ids() |> Enum.count(&String.starts_with?(&1, "boss_"))
 
+    # HP stats for overlay
+    stats = Progress.get_stats()
+
     socket =
       socket
       |> assign(:page_title, "Dashboard")
@@ -37,6 +40,8 @@ defmodule NeovimOdysseyWeb.DashboardLive do
       |> assign(:completed_count, completed_count)
       |> assign(:bosses_cleared, bosses_cleared)
       |> assign(:ship_image, Images.ship_exterior())
+      |> assign(:hp, stats.hp)
+      |> assign(:max_hp, stats.max_hp)
 
     {:ok, socket}
   end
@@ -46,6 +51,14 @@ defmodule NeovimOdysseyWeb.DashboardLive do
     ~H"""
     <%!-- Hero Banner --%>
     <.hero_banner image={@ship_image} height={:tall}>
+      <.stats_overlay
+        level={@level}
+        title={@title}
+        level_info={@level_info}
+        hp={@hp}
+        max_hp={@max_hp}
+        bosses_cleared={@bosses_cleared}
+      />
       <h1 class="text-4xl md:text-5xl font-black text-slate-100 tracking-tight mb-1">The Meridian</h1>
       <p class="text-amber-400 font-bold text-lg tracking-wider uppercase">{@title}</p>
       <div class="mt-3 max-w-md">

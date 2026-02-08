@@ -1,7 +1,7 @@
 defmodule NeovimOdysseyWeb.QuestLive do
   use NeovimOdysseyWeb, :live_view
 
-  alias NeovimOdyssey.{Quests, Progress}
+  alias NeovimOdyssey.{Quests, Progress, Verification}
   alias NeovimOdysseyWeb.Helpers.Images
 
   @zone_button_styles %{
@@ -35,8 +35,17 @@ defmodule NeovimOdysseyWeb.QuestLive do
       btn_style = Map.get(@zone_button_styles, zone_number, @zone_button_styles[1])
       card_border = Map.get(@zone_card_borders, zone_number, @zone_card_borders[1])
 
-      zone_image = Images.zone_image(zone_number)
+      # Use quest_image with fallback to zone image
+      zone_image = Images.quest_image(quest_id)
       npc_portrait = if zone && zone.npc, do: Images.npc_portrait(zone.npc), else: nil
+
+      # Stats overlay data
+      stats = Progress.get_stats()
+      xp = Progress.total_xp()
+      level = Progress.current_level(xp)
+      level_info = Progress.xp_for_next_level(xp)
+      title = Progress.level_title(level)
+      bosses_cleared = Progress.completed_quest_ids() |> Enum.count(&String.starts_with?(&1, "boss_"))
 
       socket =
         socket
@@ -51,6 +60,15 @@ defmodule NeovimOdysseyWeb.QuestLive do
         |> assign(:level_up, nil)
         |> assign(:zone_image, zone_image)
         |> assign(:npc_portrait, npc_portrait)
+        |> assign(:verification_results, nil)
+        |> assign(:verification_status, nil)
+        |> assign(:verifying, false)
+        |> assign(:hp, stats.hp)
+        |> assign(:max_hp, stats.max_hp)
+        |> assign(:level, level)
+        |> assign(:level_info, level_info)
+        |> assign(:title, title)
+        |> assign(:bosses_cleared, bosses_cleared)
 
       {:ok, socket}
     end
@@ -71,9 +89,17 @@ defmodule NeovimOdysseyWeb.QuestLive do
       title={if @level_up, do: Progress.level_title(@level_up.new_level), else: ""}
     />
 
-    <%!-- Mini Hero Banner --%>
+    <%!-- Hero Banner (tall) with stats overlay --%>
     <div class="relative">
-      <.hero_banner image={@zone_image} height={:short}>
+      <.hero_banner image={@zone_image} height={:tall}>
+        <.stats_overlay
+          level={@level}
+          title={@title}
+          level_info={@level_info}
+          hp={@hp}
+          max_hp={@max_hp}
+          bosses_cleared={@bosses_cleared}
+        />
         <a
           href={if @zone, do: "/zones/#{@zone.number}", else: "/"}
           class="absolute top-4 left-4 inline-flex items-center gap-1 text-sm text-slate-300/80 hover:text-slate-100 transition-colors bg-slate-900/40 backdrop-blur-sm px-3 py-1.5 rounded-lg"
@@ -160,21 +186,33 @@ defmodule NeovimOdysseyWeb.QuestLive do
           </div>
         <% end %>
 
-        <%!-- Complete button --%>
+        <%!-- Verification Results --%>
+        <%= if @verification_results do %>
+          <.verification_panel results={@verification_results} status={@verification_status} />
+        <% end %>
+
+        <%!-- Complete / Verify button --%>
         <%= if @completed do %>
           <div class="text-center py-3">
             <span class="text-emerald-400 font-bold text-lg">✓ Quest Complete</span>
           </div>
         <% else %>
-          <button
-            phx-click="complete_quest"
-            class={[
-              "w-full py-3 px-6 rounded-lg font-bold text-lg transition-all duration-200 border-2 hover:shadow-lg active:scale-[0.98]",
-              @btn_style
-            ]}
-          >
-            Complete Quest
-          </button>
+          <%= if @verifying do %>
+            <div class="w-full py-3 px-6 rounded-lg font-bold text-lg text-center border-2 border-slate-600 text-slate-400">
+              <span class="inline-block animate-spin mr-2">⟳</span>
+              Verifying...
+            </div>
+          <% else %>
+            <button
+              phx-click="verify_quest"
+              class={[
+                "w-full py-3 px-6 rounded-lg font-bold text-lg transition-all duration-200 border-2 hover:shadow-lg active:scale-[0.98]",
+                @btn_style
+              ]}
+            >
+              {if @quest.verification_type in [:auto, :hybrid], do: "Verify Quest", else: "Complete Quest"}
+            </button>
+          <% end %>
         <% end %>
       </div>
     </div>
@@ -183,12 +221,72 @@ defmodule NeovimOdysseyWeb.QuestLive do
 
   @impl true
   def handle_event("complete_quest", _params, socket) do
+    # Delegate to verify_quest
+    handle_event("verify_quest", %{}, socket)
+  end
+
+  @impl true
+  def handle_event("verify_quest", _params, socket) do
+    quest = socket.assigns.quest
+    socket = assign(socket, :verifying, true)
+
+    {status, results} = Verification.verify(quest.id)
+
+    socket = assign(socket, :verifying, false)
+
+    case status do
+      :pass ->
+        socket = assign(socket, verification_results: results, verification_status: :pass)
+        complete_quest_flow(socket)
+
+      :self_attest ->
+        socket = assign(socket, verification_results: nil, verification_status: nil)
+        complete_quest_flow(socket)
+
+      :fail ->
+        socket = assign(socket, verification_results: results, verification_status: :fail)
+
+        # Boss quests lose HP on failure
+        socket =
+          if quest.type == :boss do
+            updated_stats = Progress.record_boss_attempt(quest.id, false)
+            socket
+            |> assign(:hp, updated_stats.hp)
+            |> put_flash(:error, "Boss attempt failed! You lost HP.")
+          else
+            socket
+          end
+
+        {:noreply, socket}
+    end
+  end
+
+  @impl true
+  def handle_event("dismiss_level_up", _params, socket) do
+    {:noreply, assign(socket, :level_up, nil)}
+  end
+
+  defp complete_quest_flow(socket) do
     case Progress.complete_quest(socket.assigns.quest.id) do
       {:ok, _record, result} ->
+        # Refresh stats after completion
+        stats = Progress.get_stats()
+        xp = Progress.total_xp()
+        level = Progress.current_level(xp)
+        level_info = Progress.xp_for_next_level(xp)
+        title = Progress.level_title(level)
+        bosses_cleared = Progress.completed_quest_ids() |> Enum.count(&String.starts_with?(&1, "boss_"))
+
         socket =
           socket
           |> assign(:completed, true)
           |> assign(:xp_flash, result.xp_gained)
+          |> assign(:hp, stats.hp)
+          |> assign(:max_hp, stats.max_hp)
+          |> assign(:level, level)
+          |> assign(:level_info, level_info)
+          |> assign(:title, title)
+          |> assign(:bosses_cleared, bosses_cleared)
 
         socket =
           if result.leveled_up do
@@ -208,10 +306,5 @@ defmodule NeovimOdysseyWeb.QuestLive do
       {:error, _} ->
         {:noreply, put_flash(socket, :error, "Something went wrong.")}
     end
-  end
-
-  @impl true
-  def handle_event("dismiss_level_up", _params, socket) do
-    {:noreply, assign(socket, :level_up, nil)}
   end
 end

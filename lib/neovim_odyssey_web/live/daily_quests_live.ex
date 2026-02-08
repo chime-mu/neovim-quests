@@ -101,6 +101,9 @@ defmodule NeovimOdysseyWeb.DailyQuestsLive do
   def handle_event("complete_daily", %{"quest-id" => quest_id}, socket) do
     case Progress.complete_daily_quest(quest_id) do
       {:ok, _record, result} ->
+        # Restore HP on daily quest completion
+        Progress.restore_hp()
+
         quest_data =
           Enum.map(socket.assigns.quest_data, fn qd ->
             if qd.quest.id == quest_id do

@@ -7,8 +7,6 @@ defmodule NeovimOdysseyWeb.Layouts do
 
   attr :flash, :map, required: true
   attr :current_scope, :map, default: nil
-  slot :inner_block, required: true
-
   def app(assigns) do
     xp = Progress.total_xp()
     level = Progress.current_level(xp)
@@ -48,13 +46,17 @@ defmodule NeovimOdysseyWeb.Layouts do
         <nav class="flex items-center gap-2">
           <a href="/" class="text-sm text-slate-400 hover:text-slate-200 transition-colors px-2 py-1">Map</a>
           <a href="/daily" class="text-sm text-slate-400 hover:text-slate-200 transition-colors px-2 py-1">Daily</a>
+          <a href="/inventory" class="text-sm text-slate-400 hover:text-slate-200 transition-colors px-2 py-1">Spellbook</a>
+          <button phx-click={JS.dispatch("toggle-quest-tracker")} class="text-sm text-slate-400 hover:text-slate-200 transition-colors px-2 py-1">Tracker</button>
         </nav>
       </div>
     </header>
 
     <main>
-      {render_slot(@inner_block)}
+      {@inner_content}
     </main>
+
+    <.quest_tracker />
 
     <.flash_group flash={@flash} />
     """

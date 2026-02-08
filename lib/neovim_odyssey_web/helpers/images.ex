@@ -28,5 +28,21 @@ defmodule NeovimOdysseyWeb.Helpers.Images do
     "/images/npcs/npc-#{slug}.png"
   end
 
+  def quest_image(quest_id) do
+    path = "/images/quests/quest-#{quest_id}.png"
+
+    if File.exists?(Path.join(:code.priv_dir(:neovim_odyssey), "static#{path}")) do
+      path
+    else
+      # Fallback to zone image — extract zone number from quest_id
+      case quest_id do
+        "quest_" <> rest -> zone_image(String.to_integer(String.first(rest)))
+        "boss_" <> rest -> zone_image(String.to_integer(String.first(rest)))
+        "side_" <> rest -> zone_image(String.to_integer(String.first(rest)))
+        _ -> ship_exterior()
+      end
+    end
+  end
+
   def ship_exterior, do: "/images/ship-exterior.png"
 end

@@ -25,17 +25,63 @@ import {LiveSocket} from "phoenix_live_view"
 import {hooks as colocatedHooks} from "phoenix-colocated/neovim_odyssey"
 import topbar from "../vendor/topbar"
 
+// --- Custom Hooks ---
+
+const CopyToClipboard = {
+  mounted() {
+    this.el.addEventListener("click", () => {
+      const text = this.el.dataset.snippet;
+      navigator.clipboard.writeText(text).then(() => {
+        const original = this.el.textContent;
+        this.el.textContent = "Copied!";
+        setTimeout(() => { this.el.textContent = original; }, 1500);
+      });
+    });
+  }
+};
+
+const QuestTracker = {
+  mounted() {
+    window.addEventListener("toggle-quest-tracker", () => {
+      this.el.classList.toggle("translate-x-full");
+      this.el.classList.toggle("translate-x-0");
+    });
+  }
+};
+
+const SoundPlayer = {
+  mounted() {
+    this.handleEvent("play_sound", ({sound, volume}) => {
+      const vol = volume || parseFloat(localStorage.getItem("meridian-volume") || "0.3");
+      const audio = new Audio(`/sounds/${sound}`);
+      audio.volume = vol;
+      audio.play().catch(() => {});
+    });
+  }
+};
+
 const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 const liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
   params: {_csrf_token: csrfToken},
-  hooks: {...colocatedHooks},
+  hooks: {...colocatedHooks, CopyToClipboard, QuestTracker, SoundPlayer},
 })
 
-// Show progress bar on live navigation and form submits
+// Show progress bar on live navigation and form submits with scene transitions
 topbar.config({barColors: {0: "#29d"}, shadowColor: "rgba(0, 0, 0, .3)"})
-window.addEventListener("phx:page-loading-start", _info => topbar.show(300))
-window.addEventListener("phx:page-loading-stop", _info => topbar.hide())
+window.addEventListener("phx:page-loading-start", _info => {
+  topbar.show(300);
+  document.querySelector("main")?.classList.add("scene-exit");
+});
+window.addEventListener("phx:page-loading-stop", _info => {
+  topbar.hide();
+  const main = document.querySelector("main");
+  if (main) {
+    main.classList.remove("scene-exit");
+    main.classList.add("scene-enter");
+    setTimeout(() => main.classList.remove("scene-enter"), 400);
+  }
+});
 
 // connect if there are any LiveViews on the page
 liveSocket.connect()

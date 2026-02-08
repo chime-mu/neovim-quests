@@ -43,6 +43,14 @@ defmodule NeovimOdysseyWeb.ZoneLive do
         zone_image = Images.zone_image(zone_number)
         npc_portrait = if zone.npc, do: Images.npc_portrait(zone.npc), else: nil
 
+        # Stats overlay data
+        stats = Progress.get_stats()
+        xp = Progress.total_xp()
+        level = Progress.current_level(xp)
+        level_info = Progress.xp_for_next_level(xp)
+        title = Progress.level_title(level)
+        bosses_cleared = Progress.completed_quest_ids() |> Enum.count(&String.starts_with?(&1, "boss_"))
+
         socket =
           socket
           |> assign(:page_title, "Zone #{zone_number}: #{zone.name}")
@@ -53,6 +61,12 @@ defmodule NeovimOdysseyWeb.ZoneLive do
           |> assign(:completion, completion)
           |> assign(:zone_image, zone_image)
           |> assign(:npc_portrait, npc_portrait)
+          |> assign(:hp, stats.hp)
+          |> assign(:max_hp, stats.max_hp)
+          |> assign(:level, level)
+          |> assign(:level_info, level_info)
+          |> assign(:title, title)
+          |> assign(:bosses_cleared, bosses_cleared)
 
         {:ok, socket}
       end
@@ -65,6 +79,14 @@ defmodule NeovimOdysseyWeb.ZoneLive do
     <%!-- Hero Banner --%>
     <div class="relative">
       <.hero_banner image={@zone_image} height={:tall}>
+        <.stats_overlay
+          level={@level}
+          title={@title}
+          level_info={@level_info}
+          hp={@hp}
+          max_hp={@max_hp}
+          bosses_cleared={@bosses_cleared}
+        />
         <a href="/" class="absolute top-4 left-4 inline-flex items-center gap-1 text-sm text-slate-300/80 hover:text-slate-100 transition-colors bg-slate-900/40 backdrop-blur-sm px-3 py-1.5 rounded-lg">
           ← Deck Map
         </a>

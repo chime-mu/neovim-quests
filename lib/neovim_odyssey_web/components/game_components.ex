@@ -2,6 +2,7 @@ defmodule NeovimOdysseyWeb.GameComponents do
   use Phoenix.Component
 
   alias NeovimOdysseyWeb.Helpers.Images
+  alias NeovimOdyssey.{Quests, Progress}
 
   # Zone color classes — all complete strings so Tailwind can scan them
   @zone_styles %{
@@ -326,6 +327,102 @@ defmodule NeovimOdysseyWeb.GameComponents do
     """
   end
 
+  # --- Stats Overlay ---
+
+  attr :level, :integer, required: true
+  attr :title, :string, required: true
+  attr :level_info, :map, required: true
+  attr :hp, :integer, required: true
+  attr :max_hp, :integer, required: true
+  attr :bosses_cleared, :integer, default: 0
+
+  def stats_overlay(assigns) do
+    hp_percent = if assigns.max_hp > 0, do: trunc(assigns.hp / assigns.max_hp * 100), else: 0
+    xp_percent = trunc(assigns.level_info.progress * 100)
+    assigns = assign(assigns, :hp_percent, hp_percent)
+    assigns = assign(assigns, :xp_percent, xp_percent)
+
+    ~H"""
+    <div class="absolute top-4 right-4 z-10 bg-slate-900/80 backdrop-blur-sm rounded-lg border border-slate-700/50 p-3 min-w-[180px]">
+      <%!-- Level badge --%>
+      <div class="flex items-center gap-2 mb-2">
+        <div class="w-8 h-8 rounded-full bg-amber-500/20 border border-amber-500/40 flex items-center justify-center">
+          <span class="text-xs font-black text-amber-400">{@level}</span>
+        </div>
+        <div>
+          <div class="text-xs font-bold text-slate-200">{@title}</div>
+          <div class="text-[10px] text-slate-500">{@level_info.current_xp} XP</div>
+        </div>
+      </div>
+
+      <%!-- XP bar --%>
+      <div class="mb-2">
+        <div class="flex justify-between text-[10px] text-slate-500 mb-0.5">
+          <span>XP</span>
+          <span>{@xp_percent}%</span>
+        </div>
+        <div class="h-1.5 bg-slate-700 rounded-full overflow-hidden">
+          <div
+            class="h-full bg-gradient-to-r from-amber-600 to-amber-400 rounded-full transition-all duration-1000"
+            style={"width: #{@xp_percent}%"}
+          />
+        </div>
+      </div>
+
+      <%!-- HP bar --%>
+      <div class="mb-2">
+        <div class="flex justify-between text-[10px] text-slate-500 mb-0.5">
+          <span>HP</span>
+          <span>{@hp}/{@max_hp}</span>
+        </div>
+        <div class="h-1.5 bg-slate-700 rounded-full overflow-hidden">
+          <div
+            class={[
+              "h-full rounded-full transition-all duration-1000",
+              if(@hp_percent > 50, do: "bg-gradient-to-r from-red-600 to-rose-400", else: if(@hp_percent > 25, do: "bg-gradient-to-r from-red-700 to-red-500", else: "bg-red-600 animate-pulse"))
+            ]}
+            style={"width: #{@hp_percent}%"}
+          />
+        </div>
+      </div>
+
+      <%!-- Boss kills --%>
+      <div class="flex items-center gap-1 text-[10px] text-slate-500">
+        <span>⚔</span>
+        <span>{@bosses_cleared} bosses cleared</span>
+      </div>
+    </div>
+    """
+  end
+
+  # --- Verification Panel ---
+
+  attr :results, :list, required: true
+  attr :status, :atom, required: true
+
+  def verification_panel(assigns) do
+    ~H"""
+    <div class="rounded-lg border border-slate-700/50 bg-slate-800/60 p-4 mb-4">
+      <h3 class="text-xs font-bold text-slate-400 tracking-wider uppercase mb-3">Verification Results</h3>
+      <ul class="space-y-2">
+        <%= for result <- @results do %>
+          <li class="flex items-start gap-2 text-sm">
+            <span class={if result.passed, do: "text-emerald-400 mt-0.5", else: "text-red-400 mt-0.5"}>
+              {if result.passed, do: "✓", else: "✗"}
+            </span>
+            <span class={if result.passed, do: "text-emerald-300", else: "text-red-300"}>
+              {result.message}
+            </span>
+          </li>
+        <% end %>
+      </ul>
+      <%= if @status == :fail do %>
+        <p class="text-xs text-slate-500 mt-3">Fix the failing checks and try again.</p>
+      <% end %>
+    </div>
+    """
+  end
+
   # --- Level Up Overlay ---
 
   attr :show, :boolean, default: false
@@ -349,6 +446,113 @@ defmodule NeovimOdysseyWeb.GameComponents do
         </div>
       </div>
     <% end %>
+    """
+  end
+
+  # --- Quest Tracker Sidebar ---
+
+  def quest_tracker(assigns) do
+    zones = Quests.list_zones()
+    completed_ids = Progress.completed_quest_ids() |> MapSet.new()
+
+    current_zone =
+      zones
+      |> Enum.filter(fn z -> Progress.zone_unlocked?(z.number) end)
+      |> Enum.reverse()
+      |> Enum.find(fn z ->
+        all = z.quests ++ z.side_quests ++ if(z.boss, do: [z.boss], else: [])
+        Enum.any?(all, fn q -> not MapSet.member?(completed_ids, q.id) end)
+      end)
+
+    next_quest =
+      if current_zone do
+        Enum.find(current_zone.quests, fn q -> not MapSet.member?(completed_ids, q.id) end)
+      end
+
+    side_quests =
+      if current_zone do
+        Enum.filter(current_zone.side_quests, fn q -> not MapSet.member?(completed_ids, q.id) end)
+      else
+        []
+      end
+
+    boss_status =
+      if current_zone && current_zone.boss do
+        if MapSet.member?(completed_ids, current_zone.boss.id), do: :cleared, else: :available
+      end
+
+    assigns =
+      assigns
+      |> assign(:current_zone, current_zone)
+      |> assign(:next_quest, next_quest)
+      |> assign(:side_quests, side_quests)
+      |> assign(:boss_status, boss_status)
+
+    ~H"""
+    <div
+      id="quest-tracker"
+      class="fixed top-16 right-0 w-72 h-[calc(100vh-4rem)] bg-slate-900/95 backdrop-blur border-l border-slate-800 z-30 transform translate-x-full transition-transform duration-300 overflow-y-auto"
+      phx-hook="QuestTracker"
+    >
+      <div class="p-4">
+        <h2 class="text-xs font-bold text-slate-400 tracking-wider uppercase mb-4">Quest Tracker</h2>
+
+        <%= if @current_zone do %>
+          <div class="mb-4">
+            <div class="text-sm font-bold text-slate-200 mb-1 flex items-center gap-2">
+              <span>{@current_zone.icon}</span>
+              <span>{@current_zone.name}</span>
+            </div>
+          </div>
+
+          <%= if @next_quest do %>
+            <div class="mb-4">
+              <div class="text-xs text-amber-400 font-bold mb-1">CURRENT QUEST</div>
+              <a href={"/quests/#{@next_quest.id}"} class="block rounded-lg border border-amber-500/20 bg-amber-500/5 p-3 hover:bg-amber-500/10 transition-colors">
+                <div class="text-sm font-bold text-slate-200 mb-1">{@next_quest.name}</div>
+                <ul class="space-y-1">
+                  <%= for obj <- @next_quest.objectives do %>
+                    <li class="text-xs text-slate-400 flex items-start gap-1.5">
+                      <span class="text-slate-600 mt-0.5">○</span>
+                      <span>{obj}</span>
+                    </li>
+                  <% end %>
+                </ul>
+                <div class="text-xs text-amber-400/70 mt-2">+{@next_quest.xp} XP</div>
+              </a>
+            </div>
+          <% end %>
+
+          <%= if @side_quests != [] do %>
+            <div class="mb-4">
+              <div class="text-xs text-purple-400 font-bold mb-1">SIDE QUESTS</div>
+              <%= for quest <- @side_quests do %>
+                <a href={"/quests/#{quest.id}"} class="block rounded-lg border border-purple-500/20 bg-purple-500/5 p-2 mb-1 hover:bg-purple-500/10 transition-colors">
+                  <div class="text-xs font-bold text-slate-300">{quest.name}</div>
+                  <div class="text-[10px] text-purple-400/70">+{quest.xp} XP</div>
+                </a>
+              <% end %>
+            </div>
+          <% end %>
+
+          <%= if @boss_status do %>
+            <div class="mb-4">
+              <div class="text-xs text-red-400 font-bold mb-1">BOSS</div>
+              <div class={[
+                "rounded-lg border p-2",
+                if(@boss_status == :cleared, do: "border-emerald-500/20 bg-emerald-500/5", else: "border-red-500/20 bg-red-500/5")
+              ]}>
+                <div class="text-xs font-bold text-slate-300">
+                  {if @boss_status == :cleared, do: "✓ ", else: "⚔ "}{@current_zone.boss.name}
+                </div>
+              </div>
+            </div>
+          <% end %>
+        <% else %>
+          <p class="text-sm text-slate-500">All quests completed!</p>
+        <% end %>
+      </div>
+    </div>
     """
   end
 end

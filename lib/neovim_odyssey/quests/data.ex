@@ -20,7 +20,14 @@ defmodule NeovimOdyssey.Quests.Data do
         turn_in: "All under 10 seconds.",
         type: :daily,
         npc_greeting: "Ten seconds. Open, find, edit, save. That's the drill. Go.",
-        npc_confirmation: "Clean run. Do it again tomorrow."
+        npc_confirmation: "Clean run. Do it again tomorrow.",
+        verification_type: :self_attest,
+        verification_checks: [:self_attestation],
+        loot: %{
+          name: "Speed Opener Reference",
+          snippet: "nvim .                    # open project\n<leader>ff               # find file\ni  (make edit)  <Esc>    # edit\n:w                       # save",
+          description: "Quick open-find-edit-save workflow"
+        }
       },
       %Quest{
         id: "daily_2",
@@ -33,7 +40,14 @@ defmodule NeovimOdyssey.Quests.Data do
         turn_in: "Complete the gd → gr → <leader>rn chain on a real symbol.",
         type: :daily,
         npc_greeting: "Definition, references, rename. Three moves, one flow. Practice it.",
-        npc_confirmation: "The chain is becoming instinct. Good."
+        npc_confirmation: "The chain is becoming instinct. Good.",
+        verification_type: :self_attest,
+        verification_checks: [:self_attestation],
+        loot: %{
+          name: "Symbol Chaser Reference",
+          snippet: "gd          go to definition\ngr          find references\n<leader>rn  rename symbol\n<C-o>       jump back",
+          description: "LSP navigation chain"
+        }
       },
       %Quest{
         id: "daily_3",
@@ -46,7 +60,14 @@ defmodule NeovimOdyssey.Quests.Data do
         turn_in: "Navigate without thinking about the keys.",
         type: :daily,
         npc_greeting: "Pane to split. Split to pane. No pausing. No looking at your hands.",
-        npc_confirmation: "You didn't even think about the boundary. That's the point."
+        npc_confirmation: "You didn't even think about the boundary. That's the point.",
+        verification_type: :self_attest,
+        verification_checks: [:self_attestation],
+        loot: %{
+          name: "Seamless Navigator Reference",
+          snippet: "<C-h>  move left  (split or pane)\n<C-j>  move down  (split or pane)\n<C-k>  move up    (split or pane)\n<C-l>  move right (split or pane)",
+          description: "Unified tmux/Neovim navigation keys"
+        }
       },
       %Quest{
         id: "daily_4",
@@ -59,7 +80,14 @@ defmodule NeovimOdyssey.Quests.Data do
         turn_in: "Solve a repetitive edit with a macro.",
         type: :daily,
         npc_greeting: "Find something repetitive. Record once. Apply everywhere. That's efficiency.",
-        npc_confirmation: "Batch processing. Everything else is just typing."
+        npc_confirmation: "Batch processing. Everything else is just typing.",
+        verification_type: :self_attest,
+        verification_checks: [:self_attestation],
+        loot: %{
+          name: "Batch Processor Reference",
+          snippet: "qq       start recording macro into register q\n(edits)  perform your edit sequence\nq        stop recording\n@q       replay macro once\n50@q     replay macro 50 times\n@@       replay last macro",
+          description: "Macro recording and replay"
+        }
       },
       %Quest{
         id: "daily_5",
@@ -72,7 +100,14 @@ defmodule NeovimOdyssey.Quests.Data do
         turn_in: "Use daf, cif, or via in real editing.",
         type: :daily,
         npc_greeting: "Delete a function. Change an argument. Select a block. By meaning, not by line.",
-        npc_confirmation: "Your edits cut by structure, not by position. Precise."
+        npc_confirmation: "Your edits cut by structure, not by position. Precise.",
+        verification_type: :self_attest,
+        verification_checks: [:self_attestation],
+        loot: %{
+          name: "Structural Editor Reference",
+          snippet: "daf  delete a function (outer)\ndif  delete a function (inner)\ncif  change function body\ncia  change an argument\nvaf  select a function\nvia  select an argument",
+          description: "Treesitter text object quick reference"
+        }
       }
     ]
   end
@@ -102,7 +137,14 @@ defmodule NeovimOdyssey.Quests.Data do
           turn_in: "You see a version number >= 0.9",
           type: :chain,
           npc_greeting: "Ship runs Neovim on every terminal. If yours doesn't have it, install it. I need version 0.9 or better — anything older and you'll be fighting compatibility issues all mission.",
-          npc_confirmation: "Good. That's current."
+          npc_confirmation: "Good. That's current.",
+          verification_type: :auto,
+          verification_checks: [{:command_output, "nvim --version", ~r/NVIM v0\.(9|[1-9]\d)\.\d/}],
+          loot: %{
+            name: "Neovim Installation",
+            snippet: "brew install neovim\nnvim --version",
+            description: "Package manager installation command"
+          }
         },
         %Quest{
           id: "quest_1_2",
@@ -115,7 +157,14 @@ defmodule NeovimOdyssey.Quests.Data do
           turn_in: "Edit and save a file using only vi motions",
           type: :chain,
           npc_greeting: "The previous engineer relied on GUI overlays for everything. When those crashed — and they did — he couldn't navigate bare terminal. Don't be like Kovacs. Show me you can work raw.",
-          npc_confirmation: "You know your way around a terminal. That's the baseline. Everything else builds on this."
+          npc_confirmation: "You know your way around a terminal. That's the baseline. Everything else builds on this.",
+          verification_type: :self_attest,
+          verification_checks: [:self_attestation],
+          loot: %{
+            name: "Navigation Fundamentals",
+            snippet: "h  ←  move left\nj  ↓  move down\nk  ↑  move up\nl  →  move right\n:w   save\n:q   quit\n:wq  save and quit",
+            description: "Core movement keys"
+          }
         },
         %Quest{
           id: "quest_1_3",
@@ -128,7 +177,19 @@ defmodule NeovimOdyssey.Quests.Data do
           turn_in: "Open nvim — you see relative line numbers",
           type: :chain,
           npc_greeting: "Every workstation on the ship reads from a personal config. Yours is blank. Write it. Line numbers, tab behavior, clipboard integration — the basics. Get your profile right now and everything downstream gets easier.",
-          npc_confirmation: "Relative line numbers. Smart. Makes jump commands precise without counting."
+          npc_confirmation: "Relative line numbers. Smart. Makes jump commands precise without counting.",
+          verification_type: :auto,
+          verification_checks: [
+            {:file_exists, "~/.config/nvim/init.lua"},
+            {:config_contains, ~r/vim\.opt\.number\s*=\s*true/},
+            {:config_contains, ~r/vim\.opt\.relativenumber\s*=\s*true/},
+            {:config_contains, ~r/vim\.opt\.(expandtab|shiftwidth|tabstop)/}
+          ],
+          loot: %{
+            name: "Core Settings",
+            snippet: "vim.opt.number = true\nvim.opt.relativenumber = true\nvim.opt.expandtab = true\nvim.opt.shiftwidth = 2\nvim.opt.tabstop = 2\nvim.opt.signcolumn = \"yes\"\nvim.opt.clipboard = \"unnamedplus\"",
+            description: "Essential editor options"
+          }
         },
         %Quest{
           id: "quest_1_4",
@@ -141,7 +202,14 @@ defmodule NeovimOdyssey.Quests.Data do
           turn_in: ":checkhealth runs with no critical errors",
           type: :chain,
           npc_greeting: "Before you touch anything else, run a full diagnostic. :checkhealth. It'll flag missing dependencies, broken providers, anything that'll cause problems later. Fix what it finds. I don't want surprises once we're underway.",
-          npc_confirmation: "Clean diagnostic. You're ahead of most new engineers who come through here."
+          npc_confirmation: "Clean diagnostic. You're ahead of most new engineers who come through here.",
+          verification_type: :self_attest,
+          verification_checks: [:self_attestation],
+          loot: %{
+            name: "Health Check",
+            snippet: ":checkhealth          -- run all health checks\n:checkhealth nvim     -- check core only\n:checkhealth lazy     -- check plugin manager\n:checkhealth lspconfig -- check LSP setup",
+            description: "Diagnostic commands for troubleshooting"
+          }
         }
       ],
       side_quests: [],
@@ -161,7 +229,18 @@ defmodule NeovimOdyssey.Quests.Data do
         turn_in: "You now understand that Neovim config is just Lua. No magic.",
         type: :boss,
         npc_greeting: "All right. Pop quiz. I'm going to wipe your profile and you're going to rebuild it from memory. No reference material. If you can't configure your own workstation cold, you're not ready for deep space.",
-        npc_confirmation: "You understand what you built. That's what matters. Neovim config is Lua — no magic, no abstraction layers. Just code you control. Module Bay is down on Deck 3. Ren handles subsystem installations. She's... energetic. You'll manage."
+        npc_confirmation: "You understand what you built. That's what matters. Neovim config is Lua — no magic, no abstraction layers. Just code you control. Module Bay is down on Deck 3. Ren handles subsystem installations. She's... energetic. You'll manage.",
+        verification_type: :hybrid,
+        verification_checks: [
+          {:config_contains, ~r/vim\.opt\.number\s*=\s*true/},
+          {:config_contains, ~r/vim\.g\.mapleader\s*=\s*" "/},
+          {:config_contains, ~r/vim\.keymap\.set/}
+        ],
+        loot: %{
+          name: "Boss: Cold Restart Drill",
+          snippet: "vim.opt.number = true\nvim.opt.relativenumber = true\nvim.g.mapleader = \" \"\nvim.keymap.set(\"n\", \"<leader>w\", \"<cmd>w<cr>\", { desc = \"Save file\" })\n-- Reload config: :source %",
+          description: "Combined techniques from the zone"
+        }
       }
     }
   end
@@ -191,7 +270,14 @@ defmodule NeovimOdyssey.Quests.Data do
           turn_in: ":Lazy opens the plugin manager UI",
           type: :chain,
           npc_greeting: "First thing — you need a module loader. It's called lazy.nvim. Without it, you're installing subsystems by hand, which... I mean, you could, but why would you? It handles dependencies, load order, updates — everything.",
-          npc_confirmation: "You've got the loader! Open it with :Lazy — see? Every module you install from now on shows up right there."
+          npc_confirmation: "You've got the loader! Open it with :Lazy — see? Every module you install from now on shows up right there.",
+          verification_type: :auto,
+          verification_checks: [{:dir_exists, "~/.local/share/nvim/lazy"}, {:config_contains, ~r/lazy/}],
+          loot: %{
+            name: "lazy.nvim Bootstrap",
+            snippet: "local lazypath = vim.fn.stdpath(\"data\") .. \"/lazy/lazy.nvim\"\nif not vim.loop.fs_stat(lazypath) then\n  vim.fn.system({ \"git\", \"clone\", \"--filter=blob:none\", \"https://github.com/folke/lazy.nvim.git\", \"--branch=stable\", lazypath })\nend\nvim.opt.rtp:prepend(lazypath)\nrequire(\"lazy\").setup({})",
+            description: "Plugin manager bootstrap code"
+          }
         },
         %Quest{
           id: "quest_2_2",
@@ -209,7 +295,14 @@ defmodule NeovimOdyssey.Quests.Data do
           turn_in: "<leader>ff opens a fuzzy file picker",
           type: :chain,
           npc_greeting: "This is my favorite subsystem on the whole ship. Telescope. It's a fuzzy-search sensor array — point it at any dataset and it finds what you need in seconds. But you need to bind it to your console keys.",
-          npc_confirmation: "There — see how fast it found that file? This thing is going to save you hours. Trust me."
+          npc_confirmation: "There — see how fast it found that file? This thing is going to save you hours. Trust me.",
+          verification_type: :auto,
+          verification_checks: [{:plugin_installed, "telescope.nvim"}, {:config_contains, ~r/telescope/}],
+          loot: %{
+            name: "Telescope Setup",
+            snippet: "{ \"nvim-telescope/telescope.nvim\",\n  dependencies = { \"nvim-lua/plenary.nvim\" },\n  keys = {\n    { \"<leader>ff\", \"<cmd>Telescope find_files<cr>\" },\n    { \"<leader>fg\", \"<cmd>Telescope live_grep<cr>\" },\n    { \"<leader>fb\", \"<cmd>Telescope buffers<cr>\" },\n  },\n}",
+            description: "Fuzzy finder with keymaps"
+          }
         },
         %Quest{
           id: "quest_2_3",
@@ -222,7 +315,14 @@ defmodule NeovimOdyssey.Quests.Data do
           turn_in: "Create a new file without leaving Neovim",
           type: :chain,
           npc_greeting: "Telescope finds things, but it doesn't organize them. For that you need a proper file navigator — something that maps the directory structure and lets you manipulate it. I use Oil. Some people prefer Neo-tree. Both work.",
-          npc_confirmation: "You just created a file without leaving the terminal. Think about that. Full filesystem control, right from your workstation."
+          npc_confirmation: "You just created a file without leaving the terminal. Think about that. Full filesystem control, right from your workstation.",
+          verification_type: :auto,
+          verification_checks: [{:any_dir_exists, ["~/.local/share/nvim/lazy/oil.nvim", "~/.local/share/nvim/lazy/neo-tree.nvim"]}],
+          loot: %{
+            name: "Oil.nvim Setup",
+            snippet: "{ \"stevearc/oil.nvim\",\n  opts = {},\n  keys = {\n    { \"-\", \"<cmd>Oil<cr>\", desc = \"Open parent directory\" },\n  },\n  -- Oil keymaps inside buffer:\n  -- <CR>  open file/dir\n  -- -     go up a directory\n  -- _     open cwd\n  -- gs    change sort\n  -- gx    open in external program\n}",
+            description: "File explorer as a buffer"
+          }
         },
         %Quest{
           id: "quest_2_4",
@@ -235,7 +335,14 @@ defmodule NeovimOdyssey.Quests.Data do
           turn_in: "Stage a single hunk from within Neovim",
           type: :chain,
           npc_greeting: "Okay, this one's important. Gitsigns — it hooks into the version control system and shows you exactly what's changed. Green for new lines, blue for modified, red for deleted. You can even stage individual hunks — just the lines you want, not the whole file.",
-          npc_confirmation: "You staged a single hunk. Not the whole file — just the exact change you wanted. That's precision version control."
+          npc_confirmation: "You staged a single hunk. Not the whole file — just the exact change you wanted. That's precision version control.",
+          verification_type: :auto,
+          verification_checks: [{:plugin_installed, "gitsigns.nvim"}],
+          loot: %{
+            name: "Gitsigns Setup",
+            snippet: "{ \"lewis6991/gitsigns.nvim\",\n  opts = {\n    on_attach = function(bufnr)\n      local gs = package.loaded.gitsigns\n      local map = function(mode, l, r, desc)\n        vim.keymap.set(mode, l, r, { buffer = bufnr, desc = desc })\n      end\n      map(\"n\", \"]c\", gs.next_hunk, \"Next hunk\")\n      map(\"n\", \"[c\", gs.prev_hunk, \"Prev hunk\")\n      map(\"n\", \"<leader>hs\", gs.stage_hunk, \"Stage hunk\")\n      map(\"n\", \"<leader>hr\", gs.reset_hunk, \"Reset hunk\")\n      map(\"n\", \"<leader>hp\", gs.preview_hunk, \"Preview hunk\")\n    end,\n  },\n}",
+            description: "Git integration with hunk operations"
+          }
         },
         %Quest{
           id: "quest_2_5",
@@ -248,7 +355,14 @@ defmodule NeovimOdyssey.Quests.Data do
           turn_in: "Your editor no longer looks like 1985",
           type: :chain,
           npc_greeting: "Okay, real talk — your terminal looks like it's still running the factory default theme from nine years ago. The ship's not glamorous, but your workstation should at least look like someone's home. Pick a color scheme. Get a status bar.",
-          npc_confirmation: "Now THAT looks like a proper engineering console. Professional."
+          npc_confirmation: "Now THAT looks like a proper engineering console. Professional.",
+          verification_type: :auto,
+          verification_checks: [{:plugin_installed, "lualine.nvim"}],
+          loot: %{
+            name: "Lualine + Colorscheme",
+            snippet: "{ \"catppuccin/nvim\", name = \"catppuccin\", priority = 1000,\n  config = function()\n    vim.cmd.colorscheme(\"catppuccin\")\n  end,\n},\n{ \"nvim-lualine/lualine.nvim\",\n  dependencies = { \"nvim-tree/nvim-web-devicons\" },\n  opts = {\n    options = { theme = \"catppuccin\" },\n  },\n}",
+            description: "Colorscheme and statusline"
+          }
         }
       ],
       side_quests: [
@@ -263,7 +377,14 @@ defmodule NeovimOdyssey.Quests.Data do
           turn_in: "Press <leader> and see the popup",
           type: :side,
           npc_greeting: "Almost forgot — there's a module called Which-Key. Press your leader key and wait... it shows every binding you've configured. Like having a reference manual built into your muscle memory.",
-          npc_confirmation: "See? It remembers everything, even when you forget."
+          npc_confirmation: "See? It remembers everything, even when you forget.",
+          verification_type: :auto,
+          verification_checks: [{:plugin_installed, "which-key.nvim"}],
+          loot: %{
+            name: "Which-Key Setup",
+            snippet: "{ \"folke/which-key.nvim\",\n  event = \"VeryLazy\",\n  opts = {},\n  keys = {\n    { \"<leader>?\", function()\n      require(\"which-key\").show({ global = false })\n    end, desc = \"Buffer local keymaps\" },\n  },\n}",
+            description: "Keymap discovery popup"
+          }
         }
       ],
       boss: %Quest{
@@ -282,7 +403,14 @@ defmodule NeovimOdyssey.Quests.Data do
         turn_in: "You found it without touching a file manager or a GUI.",
         type: :boss,
         npc_greeting: "So... during drydock, someone misfiled a critical system config. I've been looking for it for a week. It's somewhere in the data archives. Use every tool we just installed — search, navigate, track the changes. Find it for me?",
-        npc_confirmation: "You found it! And you did the whole thing without switching to a file manager or a GUI. That's what a properly configured workstation can do. Analysis Deck is two floors up. SOLEN runs it. Fair warning — SOLEN is the ship's AI. It's... precise."
+        npc_confirmation: "You found it! And you did the whole thing without switching to a file manager or a GUI. That's what a properly configured workstation can do. Analysis Deck is two floors up. SOLEN runs it. Fair warning — SOLEN is the ship's AI. It's... precise.",
+        verification_type: :self_attest,
+        verification_checks: [:self_attestation],
+        loot: %{
+          name: "Boss: Retrieval Operation",
+          snippet: "<leader>ff   find files (Telescope)\n<leader>fg   live grep (Telescope)\n-            open file explorer (Oil)\n<leader>hs   stage hunk (Gitsigns)\n<leader>hp   preview hunk (Gitsigns)",
+          description: "Combined techniques from the zone"
+        }
       }
     }
   end
@@ -312,7 +440,14 @@ defmodule NeovimOdyssey.Quests.Data do
           turn_in: "Open a file and see real diagnostics in the gutter",
           type: :chain,
           npc_greeting: "The Language Server Protocol. A standardized interface through which your terminal communicates with any language's analysis engine. Install nvim-lspconfig and connect it to a language server. I will observe the results with considerable interest.",
-          npc_confirmation: "Diagnostics are appearing in your gutter. Those are not heuristics. The language server parsed your code structurally. It knows."
+          npc_confirmation: "Diagnostics are appearing in your gutter. Those are not heuristics. The language server parsed your code structurally. It knows.",
+          verification_type: :auto,
+          verification_checks: [{:plugin_installed, "nvim-lspconfig"}, {:config_contains, ~r/lspconfig/}],
+          loot: %{
+            name: "LSP Config Setup",
+            snippet: "{ \"neovim/nvim-lspconfig\",\n  config = function()\n    local lspconfig = require(\"lspconfig\")\n    -- Configure your language server:\n    lspconfig.lua_ls.setup({})\n    -- lspconfig.ts_ls.setup({})\n    -- lspconfig.pyright.setup({})\n    -- lspconfig.elixirls.setup({ cmd = { \"elixir-ls\" } })\n  end,\n}",
+            description: "Language Server Protocol configuration"
+          }
         },
         %Quest{
           id: "quest_3_2",
@@ -331,7 +466,14 @@ defmodule NeovimOdyssey.Quests.Data do
           turn_in: "Jump to a function's definition with gd, then back with Ctrl-o",
           type: :chain,
           npc_greeting: "A language server that cannot be queried is a database with no interface. Configure these keybindings. They represent the fundamental queries any systems engineer must have at hand.",
-          npc_confirmation: "You navigated to a definition and returned. The codebase is no longer opaque to you. You can trace any call to its origin."
+          npc_confirmation: "You navigated to a definition and returned. The codebase is no longer opaque to you. You can trace any call to its origin.",
+          verification_type: :auto,
+          verification_checks: [{:config_contains, ~r/gd/}, {:config_contains, ~r/gr/}],
+          loot: %{
+            name: "LSP Keymaps",
+            snippet: "vim.api.nvim_create_autocmd(\"LspAttach\", {\n  callback = function(ev)\n    local opts = { buffer = ev.buf }\n    vim.keymap.set(\"n\", \"gd\", vim.lsp.buf.definition, opts)\n    vim.keymap.set(\"n\", \"gr\", vim.lsp.buf.references, opts)\n    vim.keymap.set(\"n\", \"K\", vim.lsp.buf.hover, opts)\n    vim.keymap.set(\"n\", \"<leader>rn\", vim.lsp.buf.rename, opts)\n    vim.keymap.set(\"n\", \"<leader>ca\", vim.lsp.buf.code_action, opts)\n  end,\n})",
+            description: "LSP navigation and action keybindings"
+          }
         },
         %Quest{
           id: "quest_3_3",
@@ -344,7 +486,14 @@ defmodule NeovimOdyssey.Quests.Data do
           turn_in: "Start typing a function name and see intelligent suggestions",
           type: :chain,
           npc_greeting: "Typing every function name in full is inefficient by a factor I find uncomfortable to calculate. nvim-cmp provides completions drawn directly from the language server. It does not guess. It queries the type system.",
-          npc_confirmation: "Intelligent suggestions. Derived from structural analysis, not pattern matching. This is... satisfactory."
+          npc_confirmation: "Intelligent suggestions. Derived from structural analysis, not pattern matching. This is... satisfactory.",
+          verification_type: :auto,
+          verification_checks: [{:plugin_installed, "nvim-cmp"}],
+          loot: %{
+            name: "nvim-cmp Setup",
+            snippet: "{ \"hrsh7th/nvim-cmp\",\n  dependencies = {\n    \"hrsh7th/cmp-nvim-lsp\",\n    \"hrsh7th/cmp-buffer\",\n    \"hrsh7th/cmp-path\",\n  },\n  config = function()\n    local cmp = require(\"cmp\")\n    cmp.setup({\n      mapping = cmp.mapping.preset.insert({\n        [\"<C-Space>\"] = cmp.mapping.complete(),\n        [\"<CR>\"] = cmp.mapping.confirm({ select = true }),\n      }),\n      sources = cmp.config.sources({\n        { name = \"nvim_lsp\" },\n        { name = \"buffer\" },\n        { name = \"path\" },\n      }),\n    })\n  end,\n}",
+            description: "Autocompletion with LSP source"
+          }
         },
         %Quest{
           id: "quest_3_4",
@@ -357,7 +506,14 @@ defmodule NeovimOdyssey.Quests.Data do
           turn_in: "Notice the difference in highlighting quality",
           type: :chain,
           npc_greeting: "Regex-based syntax highlighting is adequate in the way that a flashlight is adequate when a floodlight exists. Treesitter constructs an actual syntax tree. It understands your code's structure, not merely its surface patterns.",
-          npc_confirmation: "Observe the difference. Nested strings, embedded languages, complex expressions — all parsed correctly. The flashlight has been replaced."
+          npc_confirmation: "Observe the difference. Nested strings, embedded languages, complex expressions — all parsed correctly. The flashlight has been replaced.",
+          verification_type: :auto,
+          verification_checks: [{:plugin_installed, "nvim-treesitter"}],
+          loot: %{
+            name: "Treesitter Setup",
+            snippet: "{ \"nvim-treesitter/nvim-treesitter\",\n  build = \":TSUpdate\",\n  opts = {\n    ensure_installed = { \"lua\", \"vim\", \"vimdoc\", \"javascript\", \"typescript\", \"python\" },\n    highlight = { enable = true },\n    indent = { enable = true },\n    incremental_selection = {\n      enable = true,\n      keymaps = {\n        init_selection = \"<C-space>\",\n        node_incremental = \"<C-space>\",\n        scope_incremental = false,\n        node_decremental = \"<bs>\",\n      },\n    },\n  },\n}",
+            description: "Syntax-aware highlighting and selection"
+          }
         },
         %Quest{
           id: "quest_3_5",
@@ -374,7 +530,14 @@ defmodule NeovimOdyssey.Quests.Data do
           turn_in: "Delete a function, undo, then change a single argument — all with motions",
           type: :chain,
           npc_greeting: "And now, what I consider the most significant capability. Treesitter text objects. The ability to select, delete, and manipulate code by its semantic meaning, not its line position. A function is not 'lines 42 through 58.' A function is a function.",
-          npc_confirmation: "You deleted a function with three keystrokes, then changed a single argument with three more. Your terminal now operates with surgical precision."
+          npc_confirmation: "You deleted a function with three keystrokes, then changed a single argument with three more. Your terminal now operates with surgical precision.",
+          verification_type: :auto,
+          verification_checks: [{:plugin_installed, "nvim-treesitter-textobjects"}],
+          loot: %{
+            name: "Treesitter Text Objects",
+            snippet: "{ \"nvim-treesitter/nvim-treesitter-textobjects\",\n  dependencies = { \"nvim-treesitter/nvim-treesitter\" },\n  opts = {\n    textobjects = {\n      select = {\n        enable = true,\n        lookahead = true,\n        keymaps = {\n          [\"af\"] = \"@function.outer\",\n          [\"if\"] = \"@function.inner\",\n          [\"ac\"] = \"@class.outer\",\n          [\"ic\"] = \"@class.inner\",\n          [\"aa\"] = \"@parameter.outer\",\n          [\"ia\"] = \"@parameter.inner\",\n        },\n      },\n    },\n  },\n}",
+            description: "Semantic code selection and manipulation"
+          }
         }
       ],
       side_quests: [
@@ -389,7 +552,14 @@ defmodule NeovimOdyssey.Quests.Data do
           turn_in: "Save a messy file and watch it auto-format",
           type: :side,
           npc_greeting: "An engineer who leaves inconsistently formatted code in the ship's systems is introducing unnecessary entropy. Conform.nvim will enforce formatting standards on every save.",
-          npc_confirmation: "Automatic. Consistent. Entropy reduced."
+          npc_confirmation: "Automatic. Consistent. Entropy reduced.",
+          verification_type: :auto,
+          verification_checks: [{:plugin_installed, "conform.nvim"}],
+          loot: %{
+            name: "Conform.nvim Setup",
+            snippet: "{ \"stevearc/conform.nvim\",\n  event = { \"BufWritePre\" },\n  cmd = { \"ConformInfo\" },\n  opts = {\n    formatters_by_ft = {\n      lua = { \"stylua\" },\n      python = { \"black\" },\n      javascript = { \"prettier\" },\n      typescript = { \"prettier\" },\n    },\n    format_on_save = {\n      timeout_ms = 500,\n      lsp_fallback = true,\n    },\n  },\n}",
+            description: "Auto-format on save"
+          }
         },
         %Quest{
           id: "side_3_2",
@@ -402,7 +572,14 @@ defmodule NeovimOdyssey.Quests.Data do
           turn_in: "See linting diagnostics separate from LSP warnings",
           type: :side,
           npc_greeting: "The language server identifies errors. The linter identifies opinions — style violations, suspicious patterns, potential issues the server is too conservative to flag.",
-          npc_confirmation: "Two layers of analysis. The server and the linter. My diagnostic coverage is now comprehensive."
+          npc_confirmation: "Two layers of analysis. The server and the linter. My diagnostic coverage is now comprehensive.",
+          verification_type: :auto,
+          verification_checks: [{:plugin_installed, "nvim-lint"}],
+          loot: %{
+            name: "nvim-lint Setup",
+            snippet: "{ \"mfussenegger/nvim-lint\",\n  event = { \"BufReadPre\", \"BufNewFile\" },\n  config = function()\n    local lint = require(\"lint\")\n    lint.linters_by_ft = {\n      javascript = { \"eslint\" },\n      typescript = { \"eslint\" },\n      python = { \"pylint\" },\n    }\n    vim.api.nvim_create_autocmd({ \"BufEnter\", \"BufWritePost\", \"InsertLeave\" }, {\n      callback = function()\n        lint.try_lint()\n      end,\n    })\n  end,\n}",
+            description: "Linting diagnostics layer"
+          }
         }
       ],
       boss: %Quest{
@@ -423,7 +600,14 @@ defmodule NeovimOdyssey.Quests.Data do
         turn_in: "Your workstation now provides code intelligence equivalent to any IDE.",
         type: :boss,
         npc_greeting: "This is the trial. A real file from one of your projects. One hundred lines or more. You will refactor it using every analysis tool available to you. I will be monitoring the results.",
-        npc_confirmation: "Your workstation now provides code intelligence equivalent to any integrated development environment. Superior, perhaps — because you understand every component. The Nav Array is on Deck 7. Jin operates it. I recommend... patience."
+        npc_confirmation: "Your workstation now provides code intelligence equivalent to any integrated development environment. Superior, perhaps — because you understand every component. The Nav Array is on Deck 7. Jin operates it. I recommend... patience.",
+        verification_type: :self_attest,
+        verification_checks: [:self_attestation],
+        loot: %{
+          name: "Boss: System Refactor",
+          snippet: "gd          trace to definition\n<leader>rn  rename across project\ngr          verify all references\ndaf         delete entire function\nvaf         select function to move\n:w          format on save (conform)",
+          description: "Combined techniques from the zone"
+        }
       }
     }
   end
@@ -453,7 +637,14 @@ defmodule NeovimOdyssey.Quests.Data do
           turn_in: "Jump across a long file without hjkl or searching",
           type: :chain,
           npc_greeting: "hjkl. Line by line. Word by word. Slow. Flash lets you jump to any visible word in two keystrokes. Two. Not twenty. Two.",
-          npc_confirmation: "Better. Still slow. But better."
+          npc_confirmation: "Better. Still slow. But better.",
+          verification_type: :auto,
+          verification_checks: [{:any_dir_exists, ["~/.local/share/nvim/lazy/flash.nvim", "~/.local/share/nvim/lazy/leap.nvim"]}],
+          loot: %{
+            name: "Flash.nvim Setup",
+            snippet: "{ \"folke/flash.nvim\",\n  event = \"VeryLazy\",\n  opts = {},\n  keys = {\n    { \"s\", mode = { \"n\", \"x\", \"o\" }, function()\n      require(\"flash\").jump()\n    end, desc = \"Flash\" },\n    { \"S\", mode = { \"n\", \"x\", \"o\" }, function()\n      require(\"flash\").treesitter()\n    end, desc = \"Flash Treesitter\" },\n  },\n}",
+            description: "Jump to any visible word in 2 keystrokes"
+          }
         },
         %Quest{
           id: "quest_4_2",
@@ -466,7 +657,14 @@ defmodule NeovimOdyssey.Quests.Data do
           turn_in: "Bounce between 4 files in under 2 seconds",
           type: :chain,
           npc_greeting: "You have four files you touch every shift. Maybe five. Why are you searching for them? Harpoon. Mark them. Switch between them like breathing.",
-          npc_confirmation: "Four files. Under two seconds. That's the baseline. Get faster."
+          npc_confirmation: "Four files. Under two seconds. That's the baseline. Get faster.",
+          verification_type: :auto,
+          verification_checks: [{:plugin_installed, "harpoon"}],
+          loot: %{
+            name: "Harpoon Setup",
+            snippet: "{ \"ThePrimeagen/harpoon\",\n  branch = \"harpoon2\",\n  dependencies = { \"nvim-lua/plenary.nvim\" },\n  config = function()\n    local harpoon = require(\"harpoon\")\n    harpoon:setup()\n    vim.keymap.set(\"n\", \"<leader>a\", function() harpoon:list():add() end)\n    vim.keymap.set(\"n\", \"<C-e>\", function() harpoon.ui:toggle_quick_menu(harpoon:list()) end)\n    vim.keymap.set(\"n\", \"<leader>1\", function() harpoon:list():select(1) end)\n    vim.keymap.set(\"n\", \"<leader>2\", function() harpoon:list():select(2) end)\n    vim.keymap.set(\"n\", \"<leader>3\", function() harpoon:list():select(3) end)\n    vim.keymap.set(\"n\", \"<leader>4\", function() harpoon:list():select(4) end)\n  end,\n}",
+            description: "Quick file switching with marks"
+          }
         },
         %Quest{
           id: "quest_4_3",
@@ -484,7 +682,14 @@ defmodule NeovimOdyssey.Quests.Data do
           turn_in: "Work with 3 splits open comfortably",
           type: :chain,
           npc_greeting: "One file at a time? What is this, a single-display terminal from the 2040s? Splits. Learn them. Live in them.",
-          npc_confirmation: "Three splits. Three contexts. Zero friction. Now you're thinking in parallel."
+          npc_confirmation: "Three splits. Three contexts. Zero friction. Now you're thinking in parallel.",
+          verification_type: :self_attest,
+          verification_checks: [:self_attestation],
+          loot: %{
+            name: "Split Navigation Keymaps",
+            snippet: "-- Faster split navigation\nvim.keymap.set(\"n\", \"<C-h>\", \"<C-w>h\", { desc = \"Move to left split\" })\nvim.keymap.set(\"n\", \"<C-j>\", \"<C-w>j\", { desc = \"Move to lower split\" })\nvim.keymap.set(\"n\", \"<C-k>\", \"<C-w>k\", { desc = \"Move to upper split\" })\nvim.keymap.set(\"n\", \"<C-l>\", \"<C-w>l\", { desc = \"Move to right split\" })\n-- Resize splits\nvim.keymap.set(\"n\", \"<C-Up>\", \"<cmd>resize +2<cr>\")\nvim.keymap.set(\"n\", \"<C-Down>\", \"<cmd>resize -2<cr>\")\nvim.keymap.set(\"n\", \"<C-Left>\", \"<cmd>vertical resize -2<cr>\")\nvim.keymap.set(\"n\", \"<C-Right>\", \"<cmd>vertical resize +2<cr>\")",
+            description: "Fast split creation and navigation"
+          }
         },
         %Quest{
           id: "quest_4_4",
@@ -497,7 +702,14 @@ defmodule NeovimOdyssey.Quests.Data do
           turn_in: "Navigate from a Neovim split to a tmux pane without thinking",
           type: :chain,
           npc_greeting: "Your terminal has walls. Tmux panes on one side, Neovim splits on the other. vim-tmux-navigator tears those walls down. One set of keys. Seamless.",
-          npc_confirmation: "You didn't even think about the boundary, did you? That's the point."
+          npc_confirmation: "You didn't even think about the boundary, did you? That's the point.",
+          verification_type: :auto,
+          verification_checks: [{:plugin_installed, "vim-tmux-navigator"}],
+          loot: %{
+            name: "vim-tmux-navigator Setup",
+            snippet: "{ \"christoomey/vim-tmux-navigator\",\n  lazy = false,\n  cmd = {\n    \"TmuxNavigateLeft\",\n    \"TmuxNavigateDown\",\n    \"TmuxNavigateUp\",\n    \"TmuxNavigateRight\",\n  },\n  keys = {\n    { \"<C-h>\", \"<cmd>TmuxNavigateLeft<cr>\" },\n    { \"<C-j>\", \"<cmd>TmuxNavigateDown<cr>\" },\n    { \"<C-k>\", \"<cmd>TmuxNavigateUp<cr>\" },\n    { \"<C-l>\", \"<cmd>TmuxNavigateRight<cr>\" },\n  },\n}\n-- Also add to ~/.tmux.conf:\n-- set -g @plugin 'christoomey/vim-tmux-navigator'",
+            description: "Seamless tmux/Neovim pane navigation"
+          }
         },
         %Quest{
           id: "quest_4_5",
@@ -510,7 +722,14 @@ defmodule NeovimOdyssey.Quests.Data do
           turn_in: "Solve a repetitive editing task with a macro in under 30 seconds",
           type: :chain,
           npc_greeting: "Fifty lines. Same edit. You could do it one at a time. Or you could do it once and let the macro do the rest. qq, record, q, 50@q. Done.",
-          npc_confirmation: "Under thirty seconds. That's batch processing. Everything else is just typing."
+          npc_confirmation: "Under thirty seconds. That's batch processing. Everything else is just typing.",
+          verification_type: :self_attest,
+          verification_checks: [:self_attestation],
+          loot: %{
+            name: "Macro Mastery",
+            snippet: "qq       start recording into register q\n(edits)  perform your sequence\nq        stop recording\n@q       replay once\n10@q     replay 10 times\n@@       replay last used macro\n:reg q   inspect macro contents\n\"qp      paste macro for editing\n\"qy      yank edited macro back",
+            description: "Advanced macro recording and editing"
+          }
         }
       ],
       side_quests: [
@@ -525,7 +744,14 @@ defmodule NeovimOdyssey.Quests.Data do
           turn_in: "Undo, branch, and recover a change you thought was lost",
           type: :side,
           npc_greeting: "Made a mistake? Wrong branch? Don't care. Undotree gives you a visual history of every change — including the ones you thought you lost. Time is a tree, not a line.",
-          npc_confirmation: "You recovered a change from a dead branch. Version history bends for you now."
+          npc_confirmation: "You recovered a change from a dead branch. Version history bends for you now.",
+          verification_type: :auto,
+          verification_checks: [{:plugin_installed, "undotree"}],
+          loot: %{
+            name: "Undotree Setup",
+            snippet: "{ \"mbbill/undotree\",\n  keys = {\n    { \"<leader>u\", vim.cmd.UndotreeToggle, desc = \"Toggle Undotree\" },\n  },\n}\n-- Enable persistent undo (add to options):\nvim.opt.undofile = true",
+            description: "Visual branching undo history"
+          }
         }
       ],
       boss: %Quest{
@@ -547,7 +773,14 @@ defmodule NeovimOdyssey.Quests.Data do
         turn_in: "You are faster in the terminal than you ever were with a GUI.",
         type: :boss,
         npc_greeting: "Five minutes. Real project. Everything you've learned, all at once. If you stop to think about which key to press, you've already lost. Go.",
-        npc_confirmation: "Faster in the terminal than any GUI jockey on the fleet. Engine Room is below us. Vasquez runs it. Bring your focus."
+        npc_confirmation: "Faster in the terminal than any GUI jockey on the fleet. Engine Room is below us. Vasquez runs it. Bring your focus.",
+        verification_type: :self_attest,
+        verification_checks: [:self_attestation],
+        loot: %{
+          name: "Boss: Emergency Response Drill",
+          snippet: "<leader>ff   find file (Telescope)\ns            jump to target (Flash)\n<leader>rn   rename symbol (LSP)\n<leader>1-4  switch files (Harpoon)\n<C-h/j/k/l>  navigate splits/panes\n:w           format + save (Conform)\n<leader>hs   stage hunk (Gitsigns)",
+          description: "Combined techniques from the zone"
+        }
       }
     }
   end
@@ -577,7 +810,14 @@ defmodule NeovimOdyssey.Quests.Data do
           turn_in: "Hit a breakpoint and inspect a variable value",
           type: :chain,
           npc_greeting: "The Debug Adapter Protocol. DAP. It's the bridge between your terminal and your language's debugger. Set a breakpoint. Launch a session. Step through the code line by line. See what the machine actually does, not what you think it does.",
-          npc_confirmation: "You hit a breakpoint. You inspected a variable. You saw the truth, not the assumption. That's the foundation of everything down here."
+          npc_confirmation: "You hit a breakpoint. You inspected a variable. You saw the truth, not the assumption. That's the foundation of everything down here.",
+          verification_type: :auto,
+          verification_checks: [{:plugin_installed, "nvim-dap"}],
+          loot: %{
+            name: "nvim-dap Setup",
+            snippet: "{ \"mfussenegger/nvim-dap\",\n  keys = {\n    { \"<leader>db\", function() require(\"dap\").toggle_breakpoint() end, desc = \"Toggle breakpoint\" },\n    { \"<F5>\", function() require(\"dap\").continue() end, desc = \"Continue\" },\n    { \"<F10>\", function() require(\"dap\").step_over() end, desc = \"Step over\" },\n    { \"<F11>\", function() require(\"dap\").step_into() end, desc = \"Step into\" },\n    { \"<F12>\", function() require(\"dap\").step_out() end, desc = \"Step out\" },\n  },\n}",
+            description: "Debug Adapter Protocol integration"
+          }
         },
         %Quest{
           id: "quest_5_2",
@@ -590,7 +830,14 @@ defmodule NeovimOdyssey.Quests.Data do
           turn_in: "Step through a bug and find the issue using the DAP UI",
           type: :chain,
           npc_greeting: "DAP alone is powerful but blind. The UI gives you eyes — watch windows, call stacks, a REPL. Now you can see the whole system at once.",
-          npc_confirmation: "You stepped through a fault and found it. Not by guessing — by watching. That's the difference between patching and engineering."
+          npc_confirmation: "You stepped through a fault and found it. Not by guessing — by watching. That's the difference between patching and engineering.",
+          verification_type: :auto,
+          verification_checks: [{:plugin_installed, "nvim-dap-ui"}],
+          loot: %{
+            name: "nvim-dap-ui Setup",
+            snippet: "{ \"rcarriga/nvim-dap-ui\",\n  dependencies = { \"mfussenegger/nvim-dap\", \"nvim-neotest/nvim-nio\" },\n  config = function()\n    local dapui = require(\"dapui\")\n    dapui.setup()\n    local dap = require(\"dap\")\n    dap.listeners.after.event_initialized[\"dapui_config\"] = function()\n      dapui.open()\n    end\n    dap.listeners.before.event_terminated[\"dapui_config\"] = function()\n      dapui.close()\n    end\n    dap.listeners.before.event_exited[\"dapui_config\"] = function()\n      dapui.close()\n    end\n  end,\n}",
+            description: "Debug UI with watch windows and call stacks"
+          }
         },
         %Quest{
           id: "quest_5_3",
@@ -603,7 +850,14 @@ defmodule NeovimOdyssey.Quests.Data do
           turn_in: "Run a single test and see inline pass/fail results",
           type: :chain,
           npc_greeting: "Tests are your early warning system. Without them, you're flying blind. Neotest lets you run them right here — one test, one file, the whole suite. Inline results. No context switching.",
-          npc_confirmation: "Inline pass/fail. Right there in your code. You never have to leave your workstation to know if something works."
+          npc_confirmation: "Inline pass/fail. Right there in your code. You never have to leave your workstation to know if something works.",
+          verification_type: :auto,
+          verification_checks: [{:plugin_installed, "neotest"}],
+          loot: %{
+            name: "Neotest Setup",
+            snippet: "{ \"nvim-neotest/neotest\",\n  dependencies = {\n    \"nvim-neotest/nvim-nio\",\n    \"nvim-lua/plenary.nvim\",\n    \"nvim-treesitter/nvim-treesitter\",\n    -- Add your adapter:\n    -- \"nvim-neotest/neotest-jest\",\n    -- \"nvim-neotest/neotest-python\",\n  },\n  keys = {\n    { \"<leader>tt\", function() require(\"neotest\").run.run() end, desc = \"Run nearest test\" },\n    { \"<leader>tf\", function() require(\"neotest\").run.run(vim.fn.expand(\"%\")) end, desc = \"Run file\" },\n    { \"<leader>ts\", function() require(\"neotest\").summary.toggle() end, desc = \"Toggle summary\" },\n  },\n}",
+            description: "Test runner with inline results"
+          }
         },
         %Quest{
           id: "quest_5_4",
@@ -616,7 +870,14 @@ defmodule NeovimOdyssey.Quests.Data do
           turn_in: "Find and fix 3 warnings using only diagnostic navigation",
           type: :chain,
           npc_greeting: "The Engine Room is full of warnings. Most engineers ignore them until they become failures. Don't be most engineers. Learn to navigate diagnostics like you navigate code — with precision.",
-          npc_confirmation: "Three warnings found and fixed using only diagnostic navigation. You didn't grep. You didn't scroll. You navigated."
+          npc_confirmation: "Three warnings found and fixed using only diagnostic navigation. You didn't grep. You didn't scroll. You navigated.",
+          verification_type: :self_attest,
+          verification_checks: [:self_attestation],
+          loot: %{
+            name: "Diagnostic Navigation",
+            snippet: "-- Diagnostic keymaps (built-in)\nvim.keymap.set(\"n\", \"]d\", vim.diagnostic.goto_next, { desc = \"Next diagnostic\" })\nvim.keymap.set(\"n\", \"[d\", vim.diagnostic.goto_prev, { desc = \"Prev diagnostic\" })\nvim.keymap.set(\"n\", \"<leader>d\", vim.diagnostic.open_float, { desc = \"Diagnostic float\" })\nvim.keymap.set(\"n\", \"<leader>q\", vim.diagnostic.setloclist, { desc = \"Diagnostic list\" })\n-- Telescope diagnostics\nvim.keymap.set(\"n\", \"<leader>fd\", \"<cmd>Telescope diagnostics<cr>\", { desc = \"Search diagnostics\" })",
+            description: "Diagnostic jumping and inspection"
+          }
         }
       ],
       side_quests: [],
@@ -638,7 +899,14 @@ defmodule NeovimOdyssey.Quests.Data do
         turn_in: "Your terminal setup now does everything a $400/year IDE does.",
         type: :boss,
         npc_greeting: "Real fault. Real system. This is why you're down here. Find it, fix it, prove it's fixed. Every tool you have. No guessing.",
-        npc_confirmation: "Your workstation now does everything a $400/year IDE does. And you understand every piece of it. Bridge is up top. Torres is waiting."
+        npc_confirmation: "Your workstation now does everything a $400/year IDE does. And you understand every piece of it. Bridge is up top. Torres is waiting.",
+        verification_type: :self_attest,
+        verification_checks: [:self_attestation],
+        loot: %{
+          name: "Boss: Engine Fault Trace",
+          snippet: "<leader>tt   run nearest test (Neotest)\n<leader>db   toggle breakpoint (DAP)\n<F5>         continue (DAP)\n<F10>        step over (DAP)\n<F11>        step into (DAP)\n<leader>rn   rename symbol (LSP)\n<leader>hs   stage hunk (Gitsigns)\n:Git commit  commit (fugitive/neogit)",
+          description: "Combined techniques from the zone"
+        }
       }
     }
   end
@@ -668,7 +936,14 @@ defmodule NeovimOdyssey.Quests.Data do
           turn_in: "Trigger a custom snippet and tab through its placeholders",
           type: :chain,
           npc_greeting: "Every senior engineer I've served with had their own shortcuts. Patterns they typed so often they could do it in their sleep. LuaSnip lets you encode those patterns. Five custom macros. The ones you use every single shift.",
-          npc_confirmation: "Custom macros. Your workflow, encoded. That's not configuration — that's engineering."
+          npc_confirmation: "Custom macros. Your workflow, encoded. That's not configuration — that's engineering.",
+          verification_type: :auto,
+          verification_checks: [{:plugin_installed, "LuaSnip"}],
+          loot: %{
+            name: "LuaSnip Setup",
+            snippet: "{ \"L3MON4D3/LuaSnip\",\n  version = \"v2.*\",\n  build = \"make install_jsregexp\",\n  config = function()\n    local ls = require(\"luasnip\")\n    local s = ls.snippet\n    local t = ls.text_node\n    local i = ls.insert_node\n    ls.add_snippets(\"lua\", {\n      s(\"fn\", {\n        t(\"function \"), i(1, \"name\"), t(\"(\"), i(2), t(\")\"),\n        t({ \"\", \"  \" }), i(3),\n        t({ \"\", \"end\" }),\n      }),\n    })\n    vim.keymap.set({ \"i\", \"s\" }, \"<Tab>\", function()\n      if ls.expand_or_jumpable() then ls.expand_or_jump() end\n    end, { silent = true })\n  end,\n}",
+            description: "Snippet engine with custom snippets"
+          }
         },
         %Quest{
           id: "quest_6_2",
@@ -681,7 +956,14 @@ defmodule NeovimOdyssey.Quests.Data do
           turn_in: "Trigger your custom function with a keymap",
           type: :chain,
           npc_greeting: "Modules are other people's solutions. Now write your own. Three functions. Things only you need. Bind them to keys. Make this terminal do something it's never done before — because you told it to.",
-          npc_confirmation: "That function exists because you needed it and you built it. Nobody else on any ship has that binding. It's yours."
+          npc_confirmation: "That function exists because you needed it and you built it. Nobody else on any ship has that binding. It's yours.",
+          verification_type: :auto,
+          verification_checks: [{:config_contains, ~r/vim\.keymap\.set/}],
+          loot: %{
+            name: "Custom Lua Functions",
+            snippet: "-- Example: Toggle diagnostics\nlocal diagnostics_active = true\nvim.keymap.set(\"n\", \"<leader>td\", function()\n  diagnostics_active = not diagnostics_active\n  if diagnostics_active then\n    vim.diagnostic.show()\n  else\n    vim.diagnostic.hide()\n  end\nend, { desc = \"Toggle diagnostics\" })\n\n-- Example: Copy file path to clipboard\nvim.keymap.set(\"n\", \"<leader>cp\", function()\n  local path = vim.fn.expand(\"%:p\")\n  vim.fn.setreg(\"+\", path)\n  vim.notify(\"Copied: \" .. path)\nend, { desc = \"Copy file path\" })\n\n-- Example: Quick scratch buffer\nvim.keymap.set(\"n\", \"<leader>sc\", function()\n  vim.cmd(\"enew\")\n  vim.bo.buftype = \"nofile\"\n  vim.bo.swapfile = false\nend, { desc = \"Scratch buffer\" })",
+            description: "Custom automation functions"
+          }
         },
         %Quest{
           id: "quest_6_3",
@@ -698,7 +980,14 @@ defmodule NeovimOdyssey.Quests.Data do
           turn_in: "Make the same edit on 10 lines faster than a multi-cursor would",
           type: :chain,
           npc_greeting: "The GUI operators love their multi-cursors. Flashy. Impressive looking. Slow. You have something better — three techniques that are faster and more precise.",
-          npc_confirmation: "Ten lines. Same edit. Faster than any multi-cursor. And you didn't need a mouse to place a single one of them."
+          npc_confirmation: "Ten lines. Same edit. Faster than any multi-cursor. And you didn't need a mouse to place a single one of them.",
+          verification_type: :self_attest,
+          verification_checks: [:self_attestation],
+          loot: %{
+            name: "Multi-Edit Techniques",
+            snippet: "-- Visual block mode\n<C-v>  enter visual block\njjj    select lines\nI      insert at start of each line\nA      append at end of each line\n\n-- Substitution\n:s/old/new/g       current line\n:%s/old/new/g      whole file\n:'<,'>s/old/new/g  visual selection\n\n-- cgn pattern (most powerful)\n/pattern<CR>       search for target\ncgn                change next match\n(type replacement)\n<Esc>              finish\n.                  repeat on next match\n.                  repeat again...",
+            description: "Three alternatives to multi-cursor"
+          }
         },
         %Quest{
           id: "quest_6_4",
@@ -711,7 +1000,14 @@ defmodule NeovimOdyssey.Quests.Data do
           turn_in: "Close Neovim, reopen it, and find everything exactly as you left it",
           type: :chain,
           npc_greeting: "An engineer who has to rebuild their console layout every shift is wasting time. Session management. When you close your terminal and reopen it, everything should be exactly where you left it.",
-          npc_confirmation: "You closed it. You reopened it. Everything's still there. That's not a feature — that's respect for your time."
+          npc_confirmation: "You closed it. You reopened it. Everything's still there. That's not a feature — that's respect for your time.",
+          verification_type: :auto,
+          verification_checks: [{:any_dir_exists, ["~/.local/share/nvim/lazy/auto-session", "~/.local/share/nvim/lazy/persistence.nvim"]}],
+          loot: %{
+            name: "Session Persistence",
+            snippet: "{ \"folke/persistence.nvim\",\n  event = \"BufReadPre\",\n  opts = {},\n  keys = {\n    { \"<leader>qs\", function() require(\"persistence\").load() end, desc = \"Restore session\" },\n    { \"<leader>ql\", function() require(\"persistence\").load({ last = true }) end, desc = \"Restore last session\" },\n    { \"<leader>qd\", function() require(\"persistence\").stop() end, desc = \"Stop persistence\" },\n  },\n}",
+            description: "Auto-restore workspace on open"
+          }
         },
         %Quest{
           id: "quest_6_5",
@@ -730,7 +1026,14 @@ defmodule NeovimOdyssey.Quests.Data do
           turn_in: "Run your script and land in your perfect workspace",
           type: :chain,
           npc_greeting: "The old engineers worked alone. That was their limitation. You have something they never had — an AI system that can write code, answer questions, and work alongside you. But only if your workspace is built for it.",
-          npc_confirmation: "One command. Perfect workspace. Human and AI, side by side. This is how modern engineering works."
+          npc_confirmation: "One command. Perfect workspace. Human and AI, side by side. This is how modern engineering works.",
+          verification_type: :self_attest,
+          verification_checks: [:self_attestation],
+          loot: %{
+            name: "Tmux Workspace Script",
+            snippet: "#!/bin/bash\n# ~/.local/bin/dev-workspace\nSESSION=\"dev\"\ntmux new-session -d -s $SESSION -n editor\n\n# Main editor pane (left, 60%)\ntmux send-keys -t $SESSION:editor \"nvim .\" C-m\n\n# Claude Code pane (right, 40%)\ntmux split-window -h -t $SESSION:editor -p 40\ntmux send-keys -t $SESSION:editor.1 \"claude\" C-m\n\n# Small test runner pane (bottom right)\ntmux split-window -v -t $SESSION:editor.1 -p 30\n\n# Focus on editor\ntmux select-pane -t $SESSION:editor.0\ntmux attach -t $SESSION",
+            description: "Tmux launch script for AI-paired development"
+          }
         }
       ],
       side_quests: [],
@@ -749,7 +1052,14 @@ defmodule NeovimOdyssey.Quests.Data do
         turn_in: "You have brought The Meridian back to life.",
         type: :boss,
         npc_greeting: "Last one. No timer this time. No drill. Just a full shift of real work. Your projects. Your problems. Your terminal. Nothing else. Every time something feels wrong, log it. Then fix it.",
-        npc_confirmation: "You came aboard as a new hire with a blank workstation. You're leaving this zone as the engineer who brought The Meridian back to life. Good work, engineer. The ship is yours."
+        npc_confirmation: "You came aboard as a new hire with a blank workstation. You're leaving this zone as the engineer who brought The Meridian back to life. Good work, engineer. The ship is yours.",
+        verification_type: :self_attest,
+        verification_checks: [:self_attestation],
+        loot: %{
+          name: "Boss: Full Shift",
+          snippet: "-- Your complete Neovim setup checklist:\n-- [x] Core options (number, relativenumber, tabs, clipboard)\n-- [x] Plugin manager (lazy.nvim)\n-- [x] Fuzzy finder (Telescope)\n-- [x] File explorer (Oil/Neo-tree)\n-- [x] Git integration (Gitsigns)\n-- [x] LSP + keymaps (nvim-lspconfig)\n-- [x] Autocompletion (nvim-cmp)\n-- [x] Syntax (Treesitter + textobjects)\n-- [x] Formatter (Conform)\n-- [x] Jump navigation (Flash/Leap)\n-- [x] File marks (Harpoon)\n-- [x] Tmux integration (vim-tmux-navigator)\n-- [x] Debugger (nvim-dap + dap-ui)\n-- [x] Test runner (Neotest)\n-- [x] Snippets (LuaSnip)\n-- [x] Sessions (persistence.nvim)\n-- [x] Custom functions (your own Lua)\n-- The Meridian is yours.",
+          description: "Combined techniques from the zone"
+        }
       }
     }
   end

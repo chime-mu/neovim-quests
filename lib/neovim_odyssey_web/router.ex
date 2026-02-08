@@ -21,6 +21,7 @@ defmodule NeovimOdysseyWeb.Router do
     live "/zones/:zone_number", ZoneLive
     live "/quests/:quest_id", QuestLive
     live "/daily", DailyQuestsLive
+    live "/inventory", InventoryLive
   end
 
   # Other scopes may use custom stacks.
