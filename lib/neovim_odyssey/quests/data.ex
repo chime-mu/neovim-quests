@@ -178,7 +178,7 @@ defmodule NeovimOdyssey.Quests.Data do
       total_xp: 190,
       npc: "Ren",
       npc_title: "Comms Operator",
-      zone_intro: "Deck 3 is warmer than the bridge — the module bay runs hot from integration testing. Racks of subsystem modules line both walls, each one a self-contained unit waiting to be loaded into the ship's software stack. Status lights blink amber: installed but unconfigured. The air hums with potential. A young operator spins around in her chair as you enter, headset half-on, three displays running simultaneously. Something on her secondary monitor is doing a live grep across what looks like the entire sensor array.",
+      zone_intro: "Deck 3 is warmer than the bridge — the module bay runs hot from integration testing. Racks of subsystem modules line both walls, each one a self-contained unit waiting to be loaded into the ship's software stack. Status lights blink amber: installed but unconfigured. The air hums with potential.",
       quests: [
         %Quest{
           id: "quest_2_1",
